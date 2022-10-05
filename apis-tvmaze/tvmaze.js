@@ -12,31 +12,49 @@ const TVMAZE_API = 'http://api.tvmaze.com/search/shows';
  *    (if no image URL given by API, put in a default image URL)
  */
 
+async function getShowsByTerm(searchTerm) {
 
-/** Function retrieves a show's poster image.
- * Takes in a show object, returns a URL for the original image OR a boilerplate
- * 'missing image' jpeg.
- */
-function getImage(show) {
+  const response = await axios.get(TVMAZE_API,
+    { params: { q: searchTerm } });
 
-  const imageLocation = show.show.image.original;
-  const missingImage = 'https://tinyurl.com/tv-missing';
+  // returns an array of all of the shows
+  return response.data.map(function (show) {
+    let { show: { id, name, summary, image } } = show;
+    image = getImage(image);
 
-  return (imageLocation ? imageLocation : missingImage)
+    return { id, name, summary, image };
+
+  });
+
+
+  // console.log(response.data);
+  //   let {show : {id, name, summary, image}} = response.data
+  //   console.log(id, name, summary, image);
+
+  // return response.data;
+
+
 
 }
 
 
 
-async function getShowsByTerm(searchTerm) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
-  //access searchTerm input to populate query string in AJAX request
-  const response = await axios.get(TVMAZE_API,
-    { params: { q: searchTerm } });
+/** Function retrieves a show's poster image.
+ * Takes in a show object, returns a URL for the original image OR a boilerplate
+ * 'missing image' jpeg.
+ */
+function getImage(images) {
 
-  // returns an array of all of the shows
-  return response.data;
+  const missingImage = 'https://tinyurl.com/tv-missing';
 
+  if(!images) {
+    return missingImage;
+  }
+  else {
+    return (images.original);
+  }
+
+}
 
 
 /** Given list of shows, create markup for each and append to DOM */
@@ -45,11 +63,12 @@ function populateShows(shows) {
   $showsList.empty();
 
   for (let show of shows) {
+
     const $show = $(
       `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="${getImage(show)}"
+              src="${show.image}"
               alt="Bletchly Circle San Francisco"
               class="w-25 me-3">
            <div class="media-body">
@@ -94,4 +113,4 @@ $searchForm.on("submit", async function (evt) {
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+// function populateEpisodes(episodes)

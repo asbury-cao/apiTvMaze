@@ -12,14 +12,32 @@ const TVMAZE_API = 'http://api.tvmaze.com/search/shows';
  *    (if no image URL given by API, put in a default image URL)
  */
 
+//function for retrieving best fit image
+// check if images exists
+// return best image size
+
+function getImage(show) {
+
+  const imageLocation = show.show.image.original;
+  const noImage = 'https://tinyurl.com/tv-missing';
+
+  return (imageLocation ? imageLocation : noImage)
+
+}
+
+
+
+
 async function getShowsByTerm(searchTerm) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
   //access searchTerm input to populate query string in AJAX request
   const response = await axios.get(TVMAZE_API,
     { params: { q: searchTerm } });
 
-  return [response.data[0].show];
+  // const image = getImage(response);
 
+  // return an array of all of the shows
+  return response.data;
 
 
 
@@ -54,7 +72,7 @@ function populateShows(shows) {
       `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
+              src="${getImage(show)}"
               alt="Bletchly Circle San Francisco"
               class="w-25 me-3">
            <div class="media-body">

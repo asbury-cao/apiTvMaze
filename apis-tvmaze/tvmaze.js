@@ -4,6 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const TVMAZE_API = 'http://api.tvmaze.com/search/shows';
+const EPISODE_API = 'http://api.tvmaze.com/shows/';
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -19,7 +20,7 @@ async function getShowsByTerm(searchTerm) {
 
   // returns an array of all of the shows
   return response.data.map(function (show) {
-    let { show: { id, name, summary, image } } = show;
+    const { show: { id, name, summary, image } } = show;
     image = getImage(image);
 
     return { id, name, summary, image };
@@ -47,7 +48,7 @@ function getImage(images) {
 
   const missingImage = 'https://tinyurl.com/tv-missing';
 
-  if(!images) {
+  if (!images) {
     return missingImage;
   }
   else {
@@ -105,12 +106,41 @@ $searchForm.on("submit", async function (evt) {
 });
 
 
+
+
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+  const idURL = `${EPISODE_API}${id}/episodes`;
+  const response = await axios.get(idURL);
 
-/** Write a clear docstring for this function... */
+  console.log(response);
 
-// function populateEpisodes(episodes)
+
+  return response.data.map(function (episode) {
+    const { id, name, season, number } = episode;
+    return { id, name, season, number };
+
+  });
+}
+
+
+
+/** populateEpisodes: accepts input of array of episode objects and appending
+ * that information to the DOM
+  */
+
+function populateEpisodes(episodes) {
+
+  const $episodeList = $('#episodesList');
+  for (let episode of episodes) {
+    const { name, season, number } = episode;
+    $('<li>')
+      .text(`${name} (season: ${season}, number: ${number})`)
+      .appendTo($episodeList);
+  }
+
+  $('#episodesArea').css("display", "show");
+};

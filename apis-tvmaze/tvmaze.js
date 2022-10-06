@@ -3,8 +3,7 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
-const TVMAZE_API = 'http://api.tvmaze.com/search/shows';
-const EPISODE_API = 'http://api.tvmaze.com/shows/';
+const TVMAZE_BASEURL = 'http://api.tvmaze.com';
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -15,7 +14,7 @@ const EPISODE_API = 'http://api.tvmaze.com/shows/';
 
 async function getShowsByTerm(searchTerm) {
 
-  const response = await axios.get(TVMAZE_API,
+  const response = await axios.get(`${TVMAZE_BASEURL}/search/shows`,
     { params: { q: searchTerm } });
 
   // returns an array of all of the shows
@@ -102,8 +101,13 @@ $searchForm.on("submit", async function (evt) {
 /** Adds eventHandler to Episodes button.
  * Gets the show ID, and appends to the DOM.
  * TODO: Make regular function for testability. wrap the evt.target in jQuery
+ * COMPLETED
  */
-$showsList.on("click", 'button', async function (evt) {
+
+
+$showsList.on("click", 'button', handleClick);
+
+async function handleClick(evt) {
   evt.preventDefault();
   console.log(evt.target);
   let targetDIV = evt.target.closest('.Show');
@@ -111,18 +115,17 @@ $showsList.on("click", 'button', async function (evt) {
 
   let episodes = await getEpisodesOfShow(showID);
   populateEpisodes(episodes);
-
-
-});
+}
 
 
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  * TODO: Change EPISODE_API naming
+ * COMPLETED
  */
 
 async function getEpisodesOfShow(id) {
-  const idURL = `${EPISODE_API}${id}/episodes`;
+  const idURL = `${TVMAZE_BASEURL}/shows/${id}/episodes`;
   const response = await axios.get(idURL);
 
   return response.data.map(function (episode) {
@@ -138,11 +141,12 @@ async function getEpisodesOfShow(id) {
 /** populateEpisodes: accepts input of array of episode objects and appending
  * that information to the DOM
  * TODO: Clear current Episode list (ul: episodesList)   $showsList.empty();
+ * COMPLETED
 
   */
 
 function populateEpisodes(episodes) {
-
+  $('#episodesArea ul').empty();
   const $episodeList = $('#episodesList');
   for (let episode of episodes) {
     const { name, season, number } = episode;

@@ -20,20 +20,12 @@ async function getShowsByTerm(searchTerm) {
 
   // returns an array of all of the shows
   return response.data.map(function (show) {
-    const { show: { id, name, summary, image } } = show;
+    let { show: { id, name, summary, image } } = show;
     image = getImage(image);
 
     return { id, name, summary, image };
 
   });
-
-
-  // console.log(response.data);
-  //   let {show : {id, name, summary, image}} = response.data
-  //   console.log(id, name, summary, image);
-
-  // return response.data;
-
 
 
 }
@@ -105,7 +97,22 @@ $searchForm.on("submit", async function (evt) {
   await searchForShowAndDisplay();
 });
 
+const $showL = $('button');
 
+
+/** Adds eventHandler to Episodes button.
+ * Gets the show ID, and appends to the DOM.
+ */
+$showsList.on("click", 'button', async function (evt) {
+  evt.preventDefault();
+  let targetDIV = evt.target.closest('.Show');
+  let showID = Number($(targetDIV).data('showId'));
+
+  let episodes = await getEpisodesOfShow(showID);
+  populateEpisodes(episodes);
+
+
+});
 
 
 /** Given a show ID, get from API and return (promise) array of episodes:
@@ -116,15 +123,13 @@ async function getEpisodesOfShow(id) {
   const idURL = `${EPISODE_API}${id}/episodes`;
   const response = await axios.get(idURL);
 
-  console.log(response);
-
-
   return response.data.map(function (episode) {
     const { id, name, season, number } = episode;
     return { id, name, season, number };
 
   });
 }
+
 
 
 
@@ -142,5 +147,5 @@ function populateEpisodes(episodes) {
       .appendTo($episodeList);
   }
 
-  $('#episodesArea').css("display", "show");
+  $('#episodesArea').css("display", "block");
 };

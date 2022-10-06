@@ -97,14 +97,15 @@ $searchForm.on("submit", async function (evt) {
   await searchForShowAndDisplay();
 });
 
-const $showL = $('button');
 
 
 /** Adds eventHandler to Episodes button.
  * Gets the show ID, and appends to the DOM.
+ * TODO: Make regular function for testability. wrap the evt.target in jQuery
  */
 $showsList.on("click", 'button', async function (evt) {
   evt.preventDefault();
+  console.log(evt.target);
   let targetDIV = evt.target.closest('.Show');
   let showID = Number($(targetDIV).data('showId'));
 
@@ -117,6 +118,7 @@ $showsList.on("click", 'button', async function (evt) {
 
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
+ * TODO: Change EPISODE_API naming
  */
 
 async function getEpisodesOfShow(id) {
@@ -135,6 +137,8 @@ async function getEpisodesOfShow(id) {
 
 /** populateEpisodes: accepts input of array of episode objects and appending
  * that information to the DOM
+ * TODO: Clear current Episode list (ul: episodesList)   $showsList.empty();
+
   */
 
 function populateEpisodes(episodes) {
